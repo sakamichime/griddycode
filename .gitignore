@@ -2,3 +2,4 @@
 .godot/
 Tools/target
 Builds/*
+--scene
