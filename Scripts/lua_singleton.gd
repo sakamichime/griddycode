@@ -69,7 +69,7 @@ var settings: Array = [
 	{
 		"property": "caret_type",
 		"display": "SETTING_CARET_TYPE",
-		"options": [{"display": "Line", "value": 0}, {"display": "Block", "value": 1}],
+		"options": [{"display": "Line", "value": 0}, {"display": "Block", "value": 1}, {"display": "Underline", "value": 2}],
 		"icon": "",
 		"value": CodeEdit.CARET_TYPE_LINE,
 	},
@@ -335,7 +335,10 @@ func handle_internal_setting_change(property: String, value: Variant) -> void:
 			locale = OS.get_locale()
 		TranslationServer.set_locale(locale)
 	if p == "caret_type":
-		code.caret_type = value
+		if value == 2:
+			code.caret_type = CodeEdit.CARET_TYPE_LINE
+		else:
+			code.caret_type = value
 	if p == "caret_blink":
 		code.caret_blink = value
 	if p == "caret_interval":

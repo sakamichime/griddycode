@@ -180,11 +180,19 @@ func _process(delta: float) -> void:
 func _get_caret_size() -> Vector2:
 	var font: Font = code.get_theme_font("font", "CodeEdit")
 	var font_size: int = code.get_theme_font_size("font_size", "CodeEdit")
-	if code.is_overtype_mode_enabled() or code.caret_type == CodeEdit.CARET_TYPE_BLOCK:
-		var block_w: float = font.get_char_size("m".unicode_at(0), font_size).x
-		return Vector2(maxf(block_w, 1.0), _get_caret_height())
 	var width: float = float(code.get_theme_constant("caret_width", "CodeEdit"))
+	var block_w: float = font.get_char_size("m".unicode_at(0), font_size).x
+	if code.is_overtype_mode_enabled() or code.caret_type == CodeEdit.CARET_TYPE_BLOCK:
+		return Vector2(maxf(block_w, 1.0), _get_caret_height())
+	if _is_underline_caret():
+		return Vector2(maxf(block_w, 1.0), maxf(width, 1.0))
 	return Vector2(maxf(width, 1.0), _get_caret_height())
+
+func _is_underline_caret() -> bool:
+	var result := LuaSingleton.get_setting("caret_type")
+	if result.size() < 1:
+		return false
+	return int(result[0]["value"]) == 2
 
 func _get_caret_height() -> float:
 	var font: Font = code.get_theme_font("font", "CodeEdit")
