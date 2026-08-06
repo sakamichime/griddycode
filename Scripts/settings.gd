@@ -16,6 +16,7 @@ var file_modified = false;
 var _show = false;
 var active_overlay: Variant;
 var node_is_transitioning: bool;
+var _collapsed_carets := false;
 
 func _ready() -> void:
 	grab_focus()
@@ -223,7 +224,15 @@ func _process(_delta):
 	if Input.is_action_just_pressed("ui_settings"):  toggle(%Settings, true, (18 * 7.5) * 2)
 	if Input.is_action_just_pressed("ui_info"):      toggle(%Info, true, 1500)
 	if Input.is_action_just_pressed("ui_theme"):     toggle(%ThemeChooser, false, (18 * 28))
-	if Input.is_action_just_pressed("ui_cancel"):    toggle(%FileDialog)
+	if Input.is_action_just_pressed("ui_cancel"):
+		if _collapsed_carets:
+			_collapsed_carets = false
+			return
+		if get_caret_count() > 1:
+			remove_secondary_carets()
+			_collapsed_carets = true
+			return
+		toggle(%FileDialog)
 	if Input.is_action_just_pressed("ui_comments"):  toggle(%Comments, false, -(18 * 7.5))
 
 func _on_gui_input(_event):
@@ -231,5 +240,78 @@ func _on_gui_input(_event):
 	if Input.is_action_just_pressed("ui_settings"):  accept_event(); toggle(%Settings, true, (18 * 7.5) * 2)
 	if Input.is_action_just_pressed("ui_info"):      accept_event(); toggle(%Info, true, 1500)
 	if Input.is_action_just_pressed("ui_theme"):     accept_event(); toggle(%ThemeChooser, false, (18 * 28))
-	if Input.is_action_just_pressed("ui_cancel"):    accept_event(); toggle(%FileDialog)
+	if Input.is_action_just_pressed("ui_cancel"):
+		if get_caret_count() > 1:
+			remove_secondary_carets()
+			_collapsed_carets = true
+			accept_event()
+			return
+		accept_event(); toggle(%FileDialog)
 	if Input.is_action_just_pressed("ui_comments"):  accept_event(); toggle(%Comments, false, -(18 * 7.5))
+
+# Multi-cursor shortcuts (VS Code style)
+func _shortcut_input(event: InputEvent) -> void:
+	if event is not InputEventKey or not event.pressed or event.echo:
+		return
+
+	var ctrl = event.ctrl_pressed and not event.alt_pressed and not event.shift_pressed
+	var ctrl_alt = event.ctrl_pressed and event.alt_pressed and not event.shift_pressed
+	var ctrl_shift = event.ctrl_pressed and not event.alt_pressed and event.shift_pressed
+
+	if ctrl and event.keycode == KEY_D:
+		add_selection_for_next_occurrence()
+		accept_event()
+	elif ctrl_shift and event.keycode == KEY_L:
+		select_all_occurrences()
+		accept_event()
+	elif ctrl_alt and event.keycode == KEY_DOWN:
+		add_caret_at_carets(true)
+		accept_event()
+	elif ctrl_alt and event.keycode == KEY_UP:
+		add_caret_at_carets(false)
+		accept_event()
+
+func select_all_occurrences() -> void:
+	var needle: String = get_selected_text(0)
+	var origin_line = get_selection_origin_line(0)
+	var origin_col = get_selection_origin_column(0)
+
+	if needle.is_empty():
+		needle = get_word_at_caret()
+		if needle.is_empty(): return
+
+	var from := 0
+	var added := 0
+	const MAX_SELECTIONS := 200
+
+	while added < MAX_SELECTIONS:
+		var idx = text.find(needle, from)
+		if idx == -1: break
+
+		var line = text.substr(0, idx).count("\n")
+		var line_start = text.rfind("\n", idx - 1) + 1 if line > 0 else 0
+		var col = idx - line_start
+
+		var is_current = line == origin_line and col == origin_col
+		if not is_current:
+			var caret_index = add_caret(line, col)
+			select(line, col, line, col + needle.length(), caret_index)
+			added += 1
+
+		from = idx + needle.length()
+
+func get_word_at_caret() -> String:
+	var caret_line = get_caret_line(0)
+	var caret_col = get_caret_column(0)
+	var line_text: String = get_line(caret_line)
+	if line_text.is_empty(): return ""
+
+	var start: int = caret_col
+	var end: int = caret_col
+
+	while start > 0 and (line_text[start - 1].is_valid_identifier() or line_text[start - 1] == "_"):
+		start -= 1
+	while end < line_text.length() and (line_text[end].is_valid_identifier() or line_text[end] == "_"):
+		end += 1
+
+	return line_text.substr(start, end - start)

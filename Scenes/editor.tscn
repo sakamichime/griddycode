@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://Scripts/theme_chooser.gd" id="9_ba634"]
 [ext_resource type="Script" path="res://Scripts/hyperlink.gd" id="11_m1mse"]
 [ext_resource type="Script" path="res://Scripts/camera.gd" id="12_x8fwh"]
+[ext_resource type="Script" path="res://Scripts/cursor_trail.gd" id="13_curtr"]
 [ext_resource type="PackedScene" uid="uid://bjnhor4pywtgc" path="res://Scenes/comments.tscn" id="14_r0w3a"]
 [ext_resource type="AudioStream" uid="uid://bw4elmrq7utxl" path="res://Music/ES_Social Feedia - Heyson.wav" id="14_tdfqv"]
 
@@ -99,6 +100,9 @@ indent_automatic = true
 auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
 script = ExtResource("2_7x3ll")
+
+[node name="CursorTrail" type="Node2D" parent="."]
+script = ExtResource("13_curtr")
 
 [node name="Background" type="ColorRect" parent="."]
 unique_name_in_owner = true
