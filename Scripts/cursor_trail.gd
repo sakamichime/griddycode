@@ -99,10 +99,6 @@ const STANDARD_CORNERS = [
 	Vector2(0.5, 0.5), Vector2(-0.5, 0.5)
 ]
 
-# Godot draws the caret as a thin rectangle (2px wide), so the trail quad
-# must match that shape instead of a whole character cell.
-const CARET_WIDTH := 2.0
-
 var cursor_instances: Dictionary = {}
 
 var last_scroll_vertical: float = 0.0
@@ -151,10 +147,10 @@ func _process(delta: float) -> void:
 	for i in caret_count:
 		if not code.is_caret_visible(i):
 			continue
-		var cell_rect := code.get_rect_at_line_column(code.get_caret_line(i), code.get_caret_column(i))
-		if cell_rect.position.x < 0 or cell_rect.position.y < 0:
+		var draw_pos := code.get_caret_draw_pos(i)
+		if draw_pos.x < 0 or draw_pos.y < 0:
 			continue
-		var target := Vector2(cell_rect.position)
+		var target := Vector2(draw_pos.x, draw_pos.y - _get_caret_height())
 		live_ids[i] = true
 
 		var instance: Dictionary
@@ -182,7 +178,13 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _get_caret_size() -> Vector2:
-	return Vector2(CARET_WIDTH, code.get_line_height())
+	var width: float = float(code.get_theme_constant("caret_width", "CodeEdit"))
+	return Vector2(maxf(width, 1.0), _get_caret_height())
+
+func _get_caret_height() -> float:
+	var font: Font = code.get_theme_font("font", "CodeEdit")
+	var font_size: int = code.get_theme_font_size("font_size", "CodeEdit")
+	return font.get_height(font_size)
 
 func _make_instance(target: Vector2, dimensions: Vector2) -> Dictionary:
 	var corners := []
