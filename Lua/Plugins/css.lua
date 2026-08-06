@@ -374,9 +374,7 @@ local css_keywords = {
     "outline-style", 
     "outline-width", 
     "overflow", 
-    "Specifies", 
     "overflow-anchor", 
-    "Specifies", 
     "overflow-wrap", 
     "overflow-x", 
     "overflow-y", 
@@ -470,7 +468,6 @@ local css_keywords = {
     "transition-delay", 
     "transition-duration", 
     "transition-property", 
-    "transition-timing-reserved", 
     "translate", 
     "unicode-bidi", 
     "user-select", 
@@ -485,8 +482,8 @@ local css_keywords = {
     "writing-mode", 
     "z-index", 
 }
-for keyword in css_keywords do
-    highlight(keyword, "function")
+for i = 1, #css_keywords do
+    highlight(css_keywords[i], "function")
 end
 
 --- Special Characters

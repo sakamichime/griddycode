@@ -1,0 +1,193 @@
+-- Highlight Keywords
+highlight("function", "reserved")
+highlight("end", "reserved")
+highlight("if", "reserved")
+highlight("elseif", "reserved")
+highlight("else", "reserved")
+highlight("for", "reserved")
+highlight("while", "reserved")
+highlight("switch", "reserved")
+highlight("case", "reserved")
+highlight("otherwise", "reserved")
+highlight("try", "reserved")
+highlight("catch", "reserved")
+highlight("return", "reserved")
+highlight("break", "reserved")
+highlight("continue", "reserved")
+highlight("global", "reserved")
+highlight("persistent", "reserved")
+highlight("classdef", "reserved")
+highlight("properties", "reserved")
+highlight("methods", "reserved")
+highlight("events", "reserved")
+highlight("enumeration", "reserved")
+highlight("parfor", "reserved")
+highlight("spmd", "reserved")
+highlight("true", "binary")
+highlight("false", "binary")
+highlight("NaN", "binary")
+highlight("Inf", "binary")
+highlight("pi", "binary")
+highlight("eps", "binary")
+
+-- Common functions
+highlight("disp", "function")
+highlight("fprintf", "function")
+highlight("sprintf", "function")
+highlight("input", "function")
+highlight("length", "function")
+highlight("size", "function")
+highlight("numel", "function")
+highlight("zeros", "function")
+highlight("ones", "function")
+highlight("eye", "function")
+highlight("rand", "function")
+highlight("randn", "function")
+highlight("linspace", "function")
+highlight("logspace", "function")
+highlight("reshape", "function")
+highlight("repmat", "function")
+highlight("sum", "function")
+highlight("prod", "function")
+highlight("mean", "function")
+highlight("median", "function")
+highlight("std", "function")
+highlight("var", "function")
+highlight("min", "function")
+highlight("max", "function")
+highlight("abs", "function")
+highlight("sqrt", "function")
+highlight("exp", "function")
+highlight("log", "function")
+highlight("log10", "function")
+highlight("sin", "function")
+highlight("cos", "function")
+highlight("tan", "function")
+highlight("plot", "function")
+highlight("plot3", "function")
+highlight("scatter", "function")
+highlight("bar", "function")
+highlight("hist", "function")
+highlight("histogram", "function")
+highlight("xlabel", "function")
+highlight("ylabel", "function")
+highlight("title", "function")
+highlight("legend", "function")
+highlight("grid", "function")
+highlight("axis", "function")
+highlight("hold", "function")
+highlight("subplot", "function")
+highlight("figure", "function")
+highlight("clf", "function")
+highlight("close", "function")
+highlight("load", "function")
+highlight("save", "function")
+highlight("clear", "function")
+highlight("clc", "function")
+highlight("whos", "function")
+highlight("who", "function")
+highlight("exist", "function")
+highlight("find", "function")
+highlight("sort", "function")
+highlight("unique", "function")
+highlight("mod", "function")
+highlight("rem", "function")
+highlight("round", "function")
+highlight("floor", "function")
+highlight("ceil", "function")
+highlight("fft", "function")
+highlight("ifft", "function")
+highlight("conv", "function")
+highlight("polyfit", "function")
+highlight("polyval", "function")
+highlight("ode45", "function")
+highlight("integral", "function")
+highlight("diff", "function")
+highlight("gradient", "function")
+
+-- Operators
+highlight("=", "operator")
+highlight("==", "operator")
+highlight("~=", "operator")
+highlight(">", "operator")
+highlight("<", "operator")
+highlight(">=", "operator")
+highlight("<=", "operator")
+highlight("&", "operator")
+highlight("&&", "operator")
+highlight("|", "operator")
+highlight("||", "operator")
+highlight("~", "operator")
+highlight("+", "operator")
+highlight("-", "operator")
+highlight("*", "operator")
+highlight("/", "operator")
+highlight("\\", "operator")
+highlight("^", "operator")
+highlight(".*", "operator")
+highlight("./", "operator")
+highlight(".\\", "operator")
+highlight(".^", "operator")
+highlight("'", "operator")
+highlight(":", "operator")
+highlight(";", "operator")
+highlight("@", "operator")
+highlight("==", "operator")
+
+-- Special Characters
+highlight("{", "binary")
+highlight("}", "binary")
+highlight("[", "binary")
+highlight("]", "binary")
+highlight("(", "binary")
+highlight(")", "binary")
+highlight(",", "binary")
+highlight("%", "binary")
+
+-- Strings
+highlight_region("\"", "\"", "string")
+highlight_region("'", "'", "string")
+
+-- Comments
+highlight_region("%", "", "comments", true)
+highlight_region("%{", "%}", "comments", false)
+
+-- Comments
+add_comment("MATLAB: the language with more license fees than features")
+add_comment("Everything is a matrix. Your tears are a vector.")
+add_comment("Indexing starts at 1. The pain also starts at 1.")
+add_comment("plot() is 90% of the language")
+add_comment("License expired? Time to relearn Python")
+add_comment("NaN is not a number, it's a lifestyle")
+
+-- Autocomplete
+
+function detect_functions(content)
+    local functionNames = {}
+
+    for line in content:gmatch("[^\r\n]+") do
+        local functionName = line:match("%s*function%s+%[?[%w_%,= ]*%]?%s*=%s*([%w_]+)")
+        if not functionName then
+            functionName = line:match("%s*function%s+([%w_]+)%s*%(")
+        end
+        if functionName then
+            table.insert(functionNames, functionName)
+        end
+    end
+
+    return functionNames
+end
+
+function detect_variables(content)
+    local variable_names = {}
+    local lines = content:gmatch("[^\r\n]+")
+
+    for line in lines do
+        local variable = line:match("%s*([%w_]+)%s*=")
+        if variable then
+            table.insert(variable_names, variable)
+        end
+    end
+
+    return variable_names
+end
