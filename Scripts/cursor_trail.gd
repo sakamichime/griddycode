@@ -151,6 +151,8 @@ func _process(delta: float) -> void:
 		if draw_pos.x < 0 or draw_pos.y < 0:
 			continue
 		var target := Vector2(draw_pos.x, draw_pos.y - dimensions.y)
+		if _is_empty_line(i):
+			target.y += _empty_line_offset()
 		live_ids[i] = true
 
 		var instance: Dictionary
@@ -201,6 +203,19 @@ func _get_caret_height() -> float:
 	var font: Font = code.get_theme_font("font", "CodeEdit")
 	var font_size: int = code.get_theme_font_size("font_size", "CodeEdit")
 	return font.get_height(font_size)
+
+func _is_empty_line(caret_id: int) -> bool:
+	var line: String = code.get_line(code.get_caret_line(caret_id))
+	return line.is_empty()
+
+func _empty_line_offset() -> float:
+	# An empty line has no glyphs: get_caret_draw_pos().y is its vertical
+	# center, while non-empty lines align the caret box bottom to that
+	# value. Shift by half the font height so the caret sits in the same
+	# spot it would on a filled line.
+	var font: Font = code.get_theme_font("font", "CodeEdit")
+	var font_size: int = code.get_theme_font_size("font_size", "CodeEdit")
+	return font.get_height(font_size) / 2.0
 
 func _make_instance(target: Vector2, dimensions: Vector2) -> Dictionary:
 	var corners := []
