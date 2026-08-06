@@ -108,6 +108,9 @@ var cursor_instances: Dictionary = {}
 var last_scroll_vertical: float = 0.0
 var last_scroll_horizontal: float = 0.0
 
+var blink_elapsed: float = 0.0
+var blink_visible: bool = true
+
 var animation_length: float = 0.10
 var short_animation_length: float = 0.04
 var trail_size: float = 1.0
@@ -115,6 +118,7 @@ var trail_size: float = 1.0
 func _ready() -> void:
 	set_process(true)
 	_hide_builtin_caret()
+	blink_visible = true
 	trail_color = LuaSingleton.gui.caret_color if "caret_color" in LuaSingleton.gui else Color(0.32, 0.55, 1, 1)
 	LuaSingleton.on_theme_load.connect(_on_theme_load)
 
@@ -138,6 +142,8 @@ func _process(delta: float) -> void:
 	last_scroll_vertical = code.scroll_vertical
 	last_scroll_horizontal = code.scroll_horizontal
 
+	_update_blink(delta)
+
 	var dimensions := _get_caret_size()
 	var caret_count = code.get_caret_count()
 
@@ -159,6 +165,8 @@ func _process(delta: float) -> void:
 			instance = cursor_instances[i]
 			if instance["last_target"] != target:
 				_compute_ranks(instance, target, dimensions, scrolling)
+				if not scrolling:
+					_reset_blink()
 
 		var corners: Array = instance["corners"]
 		var destination = target + dimensions / 2.0
@@ -224,7 +232,25 @@ func _compute_ranks(instance: Dictionary, target: Vector2, dimensions: Vector2, 
 	for i in corners.size():
 		corners[i].jump(center_destination, dimensions, ranks[i], trail_size, animation_length, short_animation_length)
 
+func _update_blink(delta: float) -> void:
+	if not code.caret_blink:
+		blink_visible = true
+		return
+	blink_elapsed += delta
+	var interval: float = code.caret_blink_interval
+	if interval <= 0.0:
+		blink_visible = true
+		return
+	var phase = fmod(blink_elapsed, interval * 2.0)
+	blink_visible = phase < interval
+
+func _reset_blink() -> void:
+	blink_elapsed = 0.0
+	blink_visible = true
+
 func _draw() -> void:
+	if not blink_visible:
+		return
 	for id in cursor_instances:
 		var corners: Array = cursor_instances[id]["corners"]
 		var points := PackedVector2Array()
