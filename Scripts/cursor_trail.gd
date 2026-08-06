@@ -47,17 +47,17 @@ class Corner:
 		var travel_direction = (corner_destination - current_position).normalized()
 		return travel_direction.dot(relative_position.normalized())
 
-	func jump(destination: Vector2, dimensions: Vector2, rank: int, trail_size: float, animation_length: float, short_animation_length: float) -> void:
+	func jump(destination: Vector2, dimensions: Vector2, rank: int, trail_size: float, base_length: float, short_length: float) -> void:
 		var target = get_destination(destination, dimensions)
 		var jump_vec = (target - previous_destination) / dimensions
 
 		var is_short_jump = absf(jump_vec.x) <= 2.001 and absf(jump_vec.y) <= 0.001
 
 		if is_short_jump:
-			animation_length = minf(animation_length, short_animation_length)
+			animation_length = minf(base_length, short_length)
 		else:
-			var leading = animation_length * clampf(1.0 - trail_size, 0.0, 1.0)
-			var trailing = animation_length
+			var leading = base_length * clampf(1.0 - trail_size, 0.0, 1.0)
+			var trailing = base_length
 			if rank >= 2:
 				animation_length = leading
 			elif rank == 1:
