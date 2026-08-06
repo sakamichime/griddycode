@@ -150,7 +150,7 @@ func _process(delta: float) -> void:
 		var draw_pos := code.get_caret_draw_pos(i)
 		if draw_pos.x < 0 or draw_pos.y < 0:
 			continue
-		var target := Vector2(draw_pos.x, draw_pos.y - _get_caret_height())
+		var target := Vector2(draw_pos.x, draw_pos.y - dimensions.y)
 		live_ids[i] = true
 
 		var instance: Dictionary
@@ -182,11 +182,14 @@ func _get_caret_size() -> Vector2:
 	var font_size: int = code.get_theme_font_size("font_size", "CodeEdit")
 	var width: float = float(code.get_theme_constant("caret_width", "CodeEdit"))
 	var block_w: float = font.get_char_size("m".unicode_at(0), font_size).x
-	if code.is_overtype_mode_enabled() or code.caret_type == CodeEdit.CARET_TYPE_BLOCK:
+	if _is_block_caret():
 		return Vector2(maxf(block_w, 1.0), _get_caret_height())
 	if _is_underline_caret():
 		return Vector2(maxf(block_w, 1.0), maxf(width, 1.0))
 	return Vector2(maxf(width, 1.0), _get_caret_height())
+
+func _is_block_caret() -> bool:
+	return code.is_overtype_mode_enabled() or code.caret_type == CodeEdit.CARET_TYPE_BLOCK
 
 func _is_underline_caret() -> bool:
 	var result := LuaSingleton.get_setting("caret_type")
@@ -278,6 +281,10 @@ func _draw() -> void:
 			center += point
 		center /= float(points.size())
 
+		var fill_alpha := 1.0
+		if _is_block_caret():
+			fill_alpha = 0.7
+
 		for layer in range(shadow_layers, 0, -1):
 			var layer_alpha = color.a * 0.08 * float(layer)
 			var dilation = float(shadow_layers - layer) * 2.0
@@ -287,4 +294,4 @@ func _draw() -> void:
 				expanded.append(point + dir * dilation)
 			draw_colored_polygon(expanded, Color(color.r, color.g, color.b, layer_alpha))
 
-		draw_colored_polygon(points, color)
+		draw_colored_polygon(points, Color(color.r, color.g, color.b, color.a * fill_alpha))
