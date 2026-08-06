@@ -282,8 +282,6 @@ func _draw() -> void:
 		center /= float(points.size())
 
 		var fill_alpha := 1.0
-		if _is_block_caret():
-			fill_alpha = 0.7
 
 		for layer in range(shadow_layers, 0, -1):
 			var layer_alpha = color.a * 0.08 * float(layer)
@@ -295,3 +293,33 @@ func _draw() -> void:
 			draw_colored_polygon(expanded, Color(color.r, color.g, color.b, layer_alpha))
 
 		draw_colored_polygon(points, Color(color.r, color.g, color.b, color.a * fill_alpha))
+
+		if _is_block_caret():
+			_draw_block_character(id)
+
+func _draw_block_character(caret_id: int) -> void:
+	var font: Font = code.get_theme_font("font", "CodeEdit")
+	var font_size: int = code.get_theme_font_size("font_size", "CodeEdit")
+	var line: String = code.get_line(code.get_caret_line(caret_id))
+	var col: int = code.get_caret_column(caret_id)
+	if col >= line.length():
+		return
+	var ch: String = line[col]
+
+	var draw_pos := code.get_caret_draw_pos(caret_id)
+	if draw_pos.x < 0 or draw_pos.y < 0:
+		return
+
+	var block_w: float = font.get_char_size("m".unicode_at(0), font_size).x
+	var char_w: float = font.get_char_size(ch.unicode_at(0), font_size).x
+	var baseline_y: float = draw_pos.y - font.get_descent(font_size)
+	var char_x: float = draw_pos.x + (block_w - char_w) / 2.0
+
+	draw_string(
+		font,
+		Vector2(char_x, baseline_y),
+		ch,
+		HORIZONTAL_ALIGNMENT_LEFT, -1.0,
+		font_size,
+		code.get_theme_color("font_color", "CodeEdit")
+	)
