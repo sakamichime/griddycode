@@ -321,5 +321,5 @@ func _draw_block_character(caret_id: int) -> void:
 		ch,
 		HORIZONTAL_ALIGNMENT_LEFT, -1.0,
 		font_size,
-		code.get_theme_color("font_color", "CodeEdit")
+		Color.WHITE
 	)
