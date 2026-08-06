@@ -143,7 +143,10 @@ func _process(delta: float) -> void:
 	for i in caret_count:
 		if not code.is_caret_visible(i):
 			continue
-		var target = code.get_caret_draw_pos(i)
+		var cell_rect := code.get_rect_at_line_column(code.get_caret_line(i), code.get_caret_column(i))
+		if cell_rect.position.x < 0 or cell_rect.position.y < 0:
+			continue
+		var target := Vector2(cell_rect.position)
 		live_ids[i] = true
 
 		var instance: Dictionary
