@@ -6,5 +6,5 @@ func save(path: String, content: String) -> void:
 	file.store_string(content)
 
 func _load(path: String) -> String:
-	var file = FileAccess.get_file_as_string(path)
-	return file
+	if !FileAccess.file_exists(path): return ""
+	return FileAccess.get_file_as_string(path)

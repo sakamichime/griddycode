@@ -18,7 +18,9 @@ func setup():
 	for comment in get_random_comments():
 		var _name = names.pick_random();
 
-		names.remove_at(names.find(_name))
+		var name_index = names.find(_name)
+		if name_index != -1:
+			names.remove_at(name_index)
 
 		var node: Comment = COMMENT.instantiate();
 
