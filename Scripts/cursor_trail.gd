@@ -99,6 +99,10 @@ const STANDARD_CORNERS = [
 	Vector2(0.5, 0.5), Vector2(-0.5, 0.5)
 ]
 
+# Godot draws the caret as a thin rectangle (2px wide), so the trail quad
+# must match that shape instead of a whole character cell.
+const CARET_WIDTH := 2.0
+
 var cursor_instances: Dictionary = {}
 
 var last_scroll_vertical: float = 0.0
@@ -127,7 +131,7 @@ func _process(delta: float) -> void:
 	last_scroll_vertical = code.scroll_vertical
 	last_scroll_horizontal = code.scroll_horizontal
 
-	var dimensions := _get_cell_size()
+	var dimensions := _get_caret_size()
 	var caret_count = code.get_caret_count()
 
 	var live_ids := {}
@@ -159,10 +163,8 @@ func _process(delta: float) -> void:
 
 	queue_redraw()
 
-func _get_cell_size() -> Vector2:
-	var font: Font = code.get_theme_default_font()
-	var font_size: int = code.get_theme_font_size("font", "CodeEdit")
-	return font.get_char_size(0x30, font_size)
+func _get_caret_size() -> Vector2:
+	return Vector2(CARET_WIDTH, code.get_line_height())
 
 func _make_instance(target: Vector2, dimensions: Vector2) -> Dictionary:
 	var corners := []
