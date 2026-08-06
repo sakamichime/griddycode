@@ -172,6 +172,21 @@ const ICONS = [
 		"color": "#d47131"
 	},
 	{
+		"extensions": ["gd"],
+		"icon": "󰎈",
+		"color": "#4791d2"
+	},
+	{
+		"extensions": ["qml", "qbs"],
+		"icon": "󱐋",
+		"color": "#41cd52"
+	},
+	{
+		"extensions": ["slint"],
+		"icon": "󰘙",
+		"color": "#6e9bff"
+	},
+	{
 		"extensions": ["lock"],
 		"icon": "",
 		"color": "#575757"

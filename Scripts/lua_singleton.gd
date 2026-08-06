@@ -445,6 +445,10 @@ func _trim(input: String):
 
 func setup_extension(extension):
 	# FILE EXTENSIONS
+	keywords_to_highlight.clear()
+	color_regions_to_highlight.clear()
+	comments.clear()
+
 	lua.bind_libraries(["base", "table", "string"])
 
 	lua.push_variant("highlight", _lua_highlight)

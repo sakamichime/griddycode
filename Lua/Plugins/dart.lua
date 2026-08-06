@@ -180,3 +180,45 @@ function detect_variables(content)
 
     return variable_names
 end
+
+function detect_api(content)
+    local api = {}
+
+    local flutter_widgets = {
+        "MaterialApp", "Scaffold", "AppBar", "FloatingActionButton",
+        "Drawer", "BottomNavigationBar", "NavigationBar", "TabBar", "TabBarView",
+        "SnackBar", "Dialog", "AlertDialog", "BottomSheet", "Card",
+        "Container", "Row", "Column", "Stack", "Wrap", "SizedBox",
+        "Expanded", "Flexible", "Padding", "Center", "Align", "Positioned",
+        "Text", "RichText", "Icon", "IconButton", "Image", "Image.asset",
+        "Image.network", "Image.file", "CircleAvatar", "ClipRRect",
+        "TextField", "TextFormField", "InkWell", "GestureDetector", "ElevatedButton",
+        "TextButton", "OutlinedButton", "Switch", "Checkbox", "Radio",
+        "Slider", "LinearProgressIndicator", "CircularProgressIndicator",
+        "ListView", "GridView", "SingleChildScrollView", "PageView",
+        "Hero", "AnimatedContainer", "AnimatedOpacity", "AnimatedSwitcher",
+        "Transform", "BackdropFilter", "FadeTransition", "ScaleTransition",
+        "InheritedWidget", "Provider", "Consumer", "ChangeNotifierProvider",
+        "Theme", "ThemeData", "MediaQuery", "Navigator", "Routes",
+        "StatelessWidget", "StatefulWidget", "State", "BuildContext",
+        "Key", "EdgeInsets", "TextStyle", "BoxDecoration", "BorderRadius",
+        "MainAxisAlignment", "CrossAxisAlignment", "Axis", "Alignment",
+        "BoxFit", "Clip", "Color", "Colors", "FontWeight", "FontStyle"
+    }
+
+    for _, widget in ipairs(flutter_widgets) do
+        table.insert(api, { name = widget, kind = "class" })
+    end
+
+    local flutter_methods = {
+        "setState", "dispose", "initState", "build", "didUpdateWidget",
+        "showDialog", "showSnackBar", "showModalBottomSheet", "showMenu",
+        "materialPageRoute", "push", "pop", "pushReplacement", "pushAndRemoveUntil"
+    };
+
+    for _, method in ipairs(flutter_methods) do
+        table.insert(api, { name = method, kind = "member", insert = method .. "()" })
+    end
+
+    return api
+end

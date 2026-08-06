@@ -156,3 +156,62 @@ function detect_variables(content)
 
     return variable_names
 end
+
+function detect_api(content)
+    local api = {}
+
+    -- Tauri
+    local tauri_symbols = {
+        "Builder", "generate_context", "generate_handler", "run", "invoke_handler",
+        "Manager", "AppHandle", "App", "WebviewWindow", "WebviewWindowBuilder",
+        "WindowEvent", "CloseRequested", "State", "Command", "command", "async_command",
+        "Emitter", "emit", "listen", "once", "unlisten", "tauri_build", "Wry"
+    };
+
+    -- egui
+    local egui_symbols = {
+        "Context", "CentralPanel", "SidePanel", "TopBottomPanel", "Window",
+        "Area", "Grid", "ScrollArea", "ComboBox", "Slider", "DragValue",
+        "TextEdit", "Button", "Checkbox", "RadioButton", "SelectableLabel",
+        "Label", "RichText", "ColorPicker", "Color32", "Pos2", "Vec2", "Rect",
+        "Frame", "Margin", "Rounding", "Stroke", "Ui", "Response", "run",
+        "ViewportBuilder", "Visuals", "Style", "FontId"
+    };
+
+    -- iced
+    local iced_symbols = {
+        "Application", "Element", "Command", "Subscription", "Task",
+        "Alignment", "Button", "Checkbox", "Column", "Container", "HorizontalSlider",
+        "Image", "PickList", "ProgressBar", "Radio", "Row", "Scrollable",
+        "Slider", "Space", "Stack", "Svg", "TabBar", "Text", "TextInput",
+        "Toggler", "VerticalSlider", "Theme", "window", "Settings", "Renderer"
+    };
+
+    -- slint (Rust API)
+    local slint_symbols = {
+        "slint", "ComponentHandle", "Weak", "SharedString", "SharedVector",
+        "ModelRc", "VecModel", "invoke_from_event_loop", "spawn_local",
+        "Timer", "TimerMode", "Repeated", "run_event_loop", "quit_event_loop",
+        "slint_build", "Compiler", "compile", "Diagnostic", "ValueType"
+    };
+
+    for _, sym in ipairs(tauri_symbols) do
+        table.insert(api, { name = sym, kind = "class" })
+    end
+    for _, sym in ipairs(egui_symbols) do
+        table.insert(api, { name = sym, kind = "class" })
+    end
+    for _, sym in ipairs(iced_symbols) do
+        table.insert(api, { name = sym, kind = "class" })
+    end
+    for _, sym in ipairs(slint_symbols) do
+        table.insert(api, { name = sym, kind = "class" })
+    end
+
+    table.insert(api, { name = "tauri::Builder", insert = "tauri::Builder::default()", kind = "class" })
+    table.insert(api, { name = "egui::CentralPanel", insert = "egui::CentralPanel::default()", kind = "class" })
+    table.insert(api, { name = "iced::Application", insert = "iced::Application", kind = "class" })
+    table.insert(api, { name = "slint::slint", insert = "slint::slint!", kind = "class" })
+
+    return api
+end

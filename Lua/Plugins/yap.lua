@@ -143,12 +143,14 @@ function detect_functions(content)
                 string.match(trimmedLine:gsub("{", ""), "%.?subroutine%s+(.-)%s*%(") or
                 string.match(trimmedLine:gsub("{", ""), "%.?async%s+(.-)%s*%(")
 
-            if functionName:find("?") then
-                functionName = functionName.gsub(functionName, "?", "")
-                functionName = trim(functionName)
-            end
+            if functionName then
+                if functionName:find("?") then
+                    functionName = functionName:gsub("?", "")
+                    functionName = trim(functionName)
+                end
 
-            table.insert(functionNames, functionName)
+                table.insert(functionNames, functionName)
+            end
         end
     end
 

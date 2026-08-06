@@ -5,6 +5,7 @@ extends CodeEdit
 
 const VARIABLE = preload("res://Icons/variable.png")
 const FUNCTION = preload("res://Icons/function.png")
+const KEYWORD = preload("res://Icons/keyword.png")
 
 @onready var rich_text_labels: Array[RichTextLabel] = [
 	%FileDialog,
@@ -72,6 +73,7 @@ func setup_highlighter() -> void:
 func _on_code_completion_requested() -> void:
 	var function_names = LuaSingleton.lua.call_function("detect_functions", [text, get_caret_line(), get_caret_column()])
 	var variable_names = LuaSingleton.lua.call_function("detect_variables", [text, get_caret_line(), get_caret_column()])
+	var api_items = LuaSingleton.lua.call_function("detect_api", [text, get_caret_line(), get_caret_column()])
 
 	if typeof(function_names) == Variant.Type.TYPE_ARRAY:
 		for each in unique_array(function_names):
@@ -79,8 +81,30 @@ func _on_code_completion_requested() -> void:
 	if typeof(variable_names) == Variant.Type.TYPE_ARRAY:
 		for each in unique_array(variable_names):
 			add_code_completion_option(CodeEdit.KIND_VARIABLE, each, each, LuaSingleton.keywords.variable, VARIABLE)
+	if typeof(api_items) == Variant.Type.TYPE_ARRAY:
+		for item in api_items:
+			if typeof(item) != Variant.Type.TYPE_DICTIONARY: continue
+			add_code_completion_option(_api_kind(item.get("kind", "class")), str(item.get("name", "")), str(item.get("insert", "")), LuaSingleton.keywords.function, FUNCTION)
+
+	for keyword in LuaSingleton.keywords_to_highlight:
+		if LuaSingleton.keywords_to_highlight[keyword] != "reserved": continue
+		if not keyword.is_valid_identifier(): continue
+		add_code_completion_option(CodeEdit.KIND_KEYWORD, keyword, keyword, LuaSingleton.keywords.reserved, KEYWORD)
 
 	update_code_completion_options(true)
+
+func _api_kind(kind: String) -> CodeEdit.CodeCompletionKind:
+	match kind:
+		"function":
+			return CodeEdit.KIND_FUNCTION
+		"signal":
+			return CodeEdit.KIND_SIGNAL
+		"variable":
+			return CodeEdit.KIND_VARIABLE
+		"member":
+			return CodeEdit.KIND_MEMBER
+		_:
+			return CodeEdit.KIND_CLASS
 
 func unique_array(arr: Array) -> Array:
 	var out := {}
