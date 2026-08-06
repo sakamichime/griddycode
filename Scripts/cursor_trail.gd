@@ -112,6 +112,11 @@ var animation_length: float = 0.10
 var short_animation_length: float = 0.04
 var trail_size: float = 1.0
 
+# Trail is additive: it fades out as the quad converges onto the built-in
+# caret, so at rest only the original cursor is visible.
+var trail_alpha: float = 0.6
+const SETTLED_EPSILON := 0.25
+
 func _ready() -> void:
 	set_process(true)
 	trail_color = LuaSingleton.gui.caret_color if "caret_color" in LuaSingleton.gui else Color(0.32, 0.55, 1, 1)
@@ -156,6 +161,7 @@ func _process(delta: float) -> void:
 			corner.update(dimensions, destination, delta, scrolling)
 
 		instance["last_target"] = target
+		instance["center_destination"] = destination
 
 	for id in cursor_instances.keys():
 		if not live_ids.has(id):
@@ -216,20 +222,32 @@ func _compute_ranks(instance: Dictionary, target: Vector2, dimensions: Vector2, 
 		corners[i].jump(center_destination, dimensions, ranks[i], trail_size, animation_length, short_animation_length)
 
 func _draw() -> void:
+	var caret_size := _get_caret_size()
 	for id in cursor_instances:
-		var corners: Array = cursor_instances[id]["corners"]
+		var instance: Dictionary = cursor_instances[id]
+		var corners: Array = instance["corners"]
+		var center_destination: Vector2 = instance["center_destination"]
+
 		var points := PackedVector2Array()
+		var max_gap := 0.0
 		for corner in corners:
 			points.append(corner.current_position)
+			var dest = corner.get_destination(center_destination, caret_size)
+			max_gap = maxf(max_gap, corner.current_position.distance_to(dest))
+
+		if max_gap < SETTLED_EPSILON:
+			continue
 
 		var color := trail_color
+		color.a *= trail_alpha * clampf(max_gap / 12.0, 0.0, 1.0)
+		var alpha := color.a
 		var center := Vector2.ZERO
 		for point in points:
 			center += point
 		center /= float(points.size())
 
 		for layer in range(shadow_layers, 0, -1):
-			var layer_alpha = color.a * 0.08 * float(layer)
+			var layer_alpha = alpha * 0.08 * float(layer)
 			var dilation = float(shadow_layers - layer) * 2.0
 			var expanded := PackedVector2Array()
 			for point in points:
