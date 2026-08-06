@@ -34,7 +34,6 @@ offset_bottom = 918.295
 theme = ExtResource("4_2bdw7")
 theme_override_font_sizes/normal_font_size = 41
 bbcode_enabled = true
-text = "kgpoakgp3 3d"
 
 [node name="Comment" type="RichTextLabel" parent="."]
 layout_mode = 2
@@ -46,6 +45,3 @@ scale = Vector2(0.075, 0.075)
 theme = ExtResource("4_2bdw7")
 theme_override_font_sizes/normal_font_size = 300
 bbcode_enabled = true
-text = "This is a placeholder. If you are seeing this:
-1. Your extension does not provide comments.
-2. GriddyCode failed to properly load. 🔥"

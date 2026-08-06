@@ -198,16 +198,19 @@ scale = Vector2(0.235, 0.235)
 theme = ExtResource("2_bh428")
 theme_override_font_sizes/normal_font_size = 121
 bbcode_enabled = true
-text = "Created by [url=https://youtube.com/facedevstuff][color=#b4a7d6]Face[/color][/url] & the contributors at [url=https://github.com/face-hh/griddycode][color=#b4a7d6]GitHub[/color][/url]
+text = "INFO_PANEL_TEXT"
+script = ExtResource("11_m1mse")
 
-Shortcuts:
-CTRL + O     - open file picker. Navigate with ↑ ↓ ⏎
-CTRL + ,     - open settings.
-CTRL + T     - open theme picker.
-CTRL + I     - open this panel.
-CTRL + L     - open the comments.
-[font_size=85]
-[color=#b6b6b6] Copyright (c) 2024 Bussin Industries. All Rights Reserved.
+[node name="RichTextLabel3" type="RichTextLabel" parent="Info"]
+offset_left = 293.0
+offset_top = 2040.0
+offset_right = 6395.0
+offset_bottom = 4616.0
+scale = Vector2(0.235, 0.235)
+theme = ExtResource("2_bh428")
+theme_override_font_sizes/normal_font_size = 85
+bbcode_enabled = true
+text = "[color=#b6b6b6] Copyright (c) 2024 Bussin Industries. All Rights Reserved.
 
 
  * You are permitted to modify Bussin GriddyCode using the Lua modding feature.
@@ -226,9 +229,7 @@ CTRL + L     - open the comments.
  * other dealings in Bussin GriddyCode.
  * 
  * Use Bussin GriddyCode responsibly and adhere to the laws of your jurisdiction.
-[/color]
-[/font_size]"
-script = ExtResource("11_m1mse")
+[/color]"
 
 [node name="Misc" type="Node2D" parent="."]
 

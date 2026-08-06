@@ -68,128 +68,128 @@ func load_system_fonts() -> Array:
 var settings: Array = [
 	{
 		"property": "caret_type",
-		"display": "Caret type",
+		"display": "SETTING_CARET_TYPE",
 		"options": [{"display": "Line", "value": 0}, {"display": "Block", "value": 1}],
 		"icon": "",
 		"value": CodeEdit.CARET_TYPE_LINE,
 	},
 	{
 		"property": "caret_blink",
-		"display": "Caret blink interval",
+		"display": "SETTING_CARET_BLINK",
 		"options": [],
 		"icon": "|",
 		"value": true
 	},
 	{
 		"property": "editor_font",
-		"display": "Editor Font",
+		"display": "SETTING_EDITOR_FONT",
 		"options": fonts,
 		"icon": "",
 		"value": 0
 	},
 	{
 		"property": "caret_interval",
-		"display": "Caret blink interval",
+		"display": "SETTING_CARET_INTERVAL",
 		"options": [],
 		"icon": "",
 		"value": 0.6,
-		"unit": "sec.",
+		"unit": "UNIT_SECONDS",
 		"min": 0.1, "max": 3,
 		"precision": true,
 	},
 	{
 		"property": "draw_line_numbers",
-		"display": "Draw Line Number",
+		"display": "SETTING_DRAW_LINE_NUMBERS",
 		"options": [],
 		"icon": "",
 		"value": true
 	},
 	{
 		"property": "code_completion",
-		"display": "Code Completion",
+		"display": "SETTING_CODE_COMPLETION",
 		"options": [],
 		"icon": "",
 		"value": true
 	},
 	{
 		"property": "indentation_size",
-		"display": "Indentation Size",
+		"display": "SETTING_INDENTATION_SIZE",
 		"options": [],
 		"icon": "󰌒",
 		"value": 4,
-		"unit": "tabs",
+		"unit": "UNIT_TABS",
 		"min": 1, "max": 8,
 	},
 	{
 		"property": "indentation_automatic",
-		"display": "Automatic Indentation",
+		"display": "SETTING_INDENTATION_AUTOMATIC",
 		"options": [],
 		"icon": "󰁨",
 		"value": true
 	},
 	{
 		"property": "indentation_use_spaces",
-		"display": "Indentation: use spaces",
+		"display": "SETTING_INDENTATION_USE_SPACES",
 		"options": [],
 		"icon": "󱁐",
 		"value": false
 	},
 	{
 		"property": "auto_brace_completion",
-		"display": "Auto Brace Completion",
+		"display": "SETTING_AUTO_BRACE_COMPLETION",
 		"options": [],
 		"icon": "󰅩",
 		"value": true
 	},
 	{
 		"property": "auto_brace_highlight_matching",
-		"display": "Highlight Matching Braces",
+		"display": "SETTING_AUTO_BRACE_HIGHLIGHT",
 		"options": [],
 		"icon": "󱃖",
 		"value": true
 	},
 	{
 		"property": "smooth_scrolling",
-		"display": "Smooth Scrolling",
+		"display": "SETTING_SMOOTH_SCROLLING",
 		"options": [],
 		"icon": "󱕒",
 		"value": true
 	},
 	{
 		"property": "v_scroll_speed",
-		"display": "Scrolling Speed",
+		"display": "SETTING_V_SCROLL_SPEED",
 		"options": [],
 		"icon": "",
 		"value": 150,
-		"unit": "px/s",
+		"unit": "UNIT_PX_S",
 		"min": 10, "max": 900,
 	},
 	{
 		"property": "minimap",
-		"display": "Minimap",
+		"display": "SETTING_MINIMAP",
 		"options": [],
 		"icon": "󰍍",
 		"value": true
 	},
 	{
 		"property": "minimap_width",
-		"display": "Minimap Width",
+		"display": "SETTING_MINIMAP_WIDTH",
 		"options": [],
 		"icon": "",
 		"value": 80,
-		"unit": "px",
+		"unit": "UNIT_PX",
 		"min": 20, "max": 500,
 	},
 	{
 		"property": "glow",
-		"display": "Glow",
+		"display": "SETTING_GLOW",
 		"options": [],
 		"icon": "󰌶",
 		"value": true,
 	},
 	{
 		"property": "sunlight",
-		"display": "Shader: Sunlight",
+		"display": "SETTING_SUNLIGHT",
 		"options": [],
 		"icon": "",
 		"value": false,
@@ -197,7 +197,7 @@ var settings: Array = [
 	},
 	{
 		"property": "vhs",
-		"display": "Shader: VHS and CRT",
+		"display": "SETTING_VHS",
 		"options": [],
 		"icon": "",
 		"value": false,
@@ -205,32 +205,32 @@ var settings: Array = [
 	},
 	{
 		"property": "music",
-		"display": "Music",
+		"display": "SETTING_MUSIC",
 		"options": [],
 		"icon": "󰝚",
 		"value": false,
 	},
 	{
 		"property": "music_volume",
-		"display": "Music: Volume",
+		"display": "SETTING_MUSIC_VOLUME",
 		"options": [],
 		"icon": "",
 		"value": 100,
-		"unit": "%",
+		"unit": "UNIT_PERCENT",
 		"min": 0, "max": 100,
 	},
 	{
 		"property": "music_move_intensity",
-		"display": "Music: Camera Intensity",
+		"display": "SETTING_MUSIC_MOVE_INTENSITY",
 		"options": [],
 		"icon": "",
 		"value": 1,
-		"unit": "x",
+		"unit": "UNIT_X",
 		"min": 0, "max": 10,
 	},
 	{
 		"property": "discord_sdk",
-		"display": "Discord SDK",
+		"display": "SETTING_DISCORD_SDK",
 		"options": [],
 		"icon": "󰙯",
 		"value": true,
@@ -254,6 +254,25 @@ var keywords: Dictionary = {
 var keywords_to_highlight: Dictionary = {}
 var color_regions_to_highlight: Array = []
 var comments: Array = []
+
+var language_options: Array = []
+
+func _ready() -> void:
+	build_language_options()
+
+func build_language_options() -> void:
+	language_options = [{ "display": "LANGUAGE_SYSTEM", "value": "" }]
+	for locale in TranslationServer.get_loaded_locales():
+		language_options.append({ "display": TranslationServer.get_locale_name(locale), "value": locale })
+
+	if get_setting("language")[1] == -1:
+		settings.insert(0, {
+			"property": "language",
+			"display": "SETTING_LANGUAGE",
+			"options": language_options,
+			"icon": "󰍵",
+			"value": 0
+		})
 
 var discord_sdk: bool = true;
 
@@ -308,6 +327,13 @@ func handle_internal_setting_change(property: String, value: Variant) -> void:
 	# oh my god he's about to do it
 	var p = property;
 
+	if p == "language":
+		var locale: String = ""
+		if language_options.size() > int(value):
+			locale = language_options[int(value)]["value"]
+		if locale.is_empty():
+			locale = OS.get_locale()
+		TranslationServer.set_locale(locale)
 	if p == "caret_type":
 		code.caret_type = value
 	if p == "caret_blink":
@@ -398,7 +424,7 @@ func _lua_set_keywords(property: String, new_color: String) -> void:
 	keywords[property] = str_to_clr(new_color)
 
 func _lua_disable_glow() -> void:
-	editor.warn("[color=yellow]WARNING[/color]: This theme disabled the \"glow\".")
+	editor.warn(tr("WARN_GLOW_DISABLED"))
 	handle_internal_setting_change("glow", false)
 
 func _lua_set_gui(property: String, new_color: String) -> void:
@@ -430,7 +456,7 @@ func setup_extension(extension):
 
 	var err: LuaError = lua.do_file("user://langs/" + extension + ".lua")
 	if err is LuaError:
-		editor.warn("[color=yellow]WARNING[/color]: This file isn’t supported. Highlighting, autocomplete, comments and other features won’t work properly.")
+		editor.warn(tr("WARN_LANG_UNSUPPORTED"))
 		print("ERROR %d: %s" % [err.type, err.message])
 		return
 
@@ -445,7 +471,7 @@ func setup_theme(given_theme: String) -> void:
 
 	var theme_err: LuaError = theme_lua.do_file("user://themes/" + given_theme + ".lua")
 	if theme_err is LuaError:
-		editor.warn("[color=yellow]WARNING[/color]: Failed to load theme: " + theme_err.message)
+		editor.warn(tr("WARN_THEME_FAILED") % theme_err.message)
 		print("ERROR %d: %s" % [theme_err.type, theme_err.message])
 		return
 

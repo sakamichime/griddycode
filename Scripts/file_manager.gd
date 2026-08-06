@@ -72,7 +72,7 @@ func _ready():
 	if !current_file:
 		LuaSingleton.setup_discord_sdk("Idle", "")
 		Code.toggle(%FileDialog)
-		warn("Welcome to [color=#c9daf8]Bussin[/color] [color=#85c6ff]GriddyCode[/color]! Please select a file, then press CTRL + I to get started! :D")
+		warn(tr("WELCOME"))
 
 func check_for_reserved() -> void:
 	var folders = ["langs", "themes"]

@@ -22,7 +22,6 @@ scale = Vector2(0.235, 0.235)
 theme = ExtResource("1_g3chd")
 theme_override_font_sizes/normal_font_size = 66
 bbcode_enabled = true
-text = "Scroll Speed"
 
 [node name="Control2" type="Control" parent="."]
 layout_mode = 2

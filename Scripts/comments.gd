@@ -9,6 +9,10 @@ func _ready():
 
 	setup()
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		setup()
+
 func setup():
 	var names = CommentsData.NAMES.duplicate();
 

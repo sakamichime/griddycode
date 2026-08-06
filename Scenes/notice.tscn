@@ -32,4 +32,3 @@ offset_top = 10.0
 offset_right = 491.0
 offset_bottom = 124.0
 bbcode_enabled = true
-text = "[color=yellow]WARNING[/color]: This file isn’t supported. Highlighting, autocomplete and comments won’t work properly."

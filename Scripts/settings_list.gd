@@ -11,6 +11,10 @@ func _ready():
 
 	LuaSingleton.on_settings_change.connect(setup_settings);
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_node_ready():
+		setup_settings()
+
 func setup_settings() -> void:
 	for child in get_children():
 		child.queue_free()
@@ -21,7 +25,7 @@ func setup_settings() -> void:
 		var _max = setting.max if setting.has("max") else 0;
 		var precision = setting.precision if setting.has("precision") else false;
 
-		create_setting(setting.display, setting.icon, setting.value, setting.options, setting.property, unit, _min, _max, precision)
+		create_setting(tr(setting.display), setting.icon, setting.value, setting.options, setting.property, unit, _min, _max, precision)
 
 	var child = UPDATE.instantiate()
 
@@ -69,7 +73,7 @@ func create_setting(text: String, icon: String, value: Variant, options: Array, 
 		dropdown.show()
 
 		for option in options:
-			dropdown.add_item(option.display)
+			dropdown.add_item(tr(option.display))
 
 		dropdown.selected = value;
 	else:
@@ -90,7 +94,7 @@ func set_label(value_label: RichTextLabel, unit: String, value: float) -> void:
 	value_label.add_text(str(value) + " ")
 
 	value_label.push_color(LuaSingleton.gui.selection_color)
-	value_label.add_text(unit)
+	value_label.add_text(tr(unit))
 	value_label.pop()
 
 func _slider_value_change(value: float, property: String, value_label: RichTextLabel, unit: String) -> void:

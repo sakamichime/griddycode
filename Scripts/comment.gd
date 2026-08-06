@@ -16,13 +16,13 @@ func setup(__name: String, __comment: String) -> void:
 
 	_name.add_text(__name);
 	_name.push_color(LuaSingleton.keywords.comments)
-	_name.add_text(" " + str(duration) + "d")
+	_name.add_text(" " + str(duration) + tr("COMMENT_DAYS"))
 	_name.pop()
 
 	comment.add_text(__comment)
 	comment.add_text("\n\n")
 	comment.push_color(LuaSingleton.keywords.comments)
-	comment.add_text(str(num) + " likes")
+	comment.add_text(str(num) + tr("COMMENT_LIKES"))
 	comment.pop()
 
 	var path = "res://Icons/Comments/" + __name + ".png";

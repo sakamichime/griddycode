@@ -113,7 +113,7 @@ func toggle(node: Object, apply_background: bool = true, factor: float = (18 * 7
 		node.active = !_show;
 
 		if _show && !editor.current_file:
-			editor.warn("[color=yellow]WARNING[/color]: You are currently in an empty file. No autosave will be performed.")
+			editor.warn(tr("WARN_EMPTY_FILE"))
 
 	if apply_background:
 		tween_fade(%Background, opacity, !_show)

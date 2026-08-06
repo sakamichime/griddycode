@@ -48,6 +48,11 @@ theme/default_font_antialiasing=2
 theme/default_font_hinting=0
 theme/default_font_multichannel_signed_distance_field=true
 
+[internationalization]
+
+locale/fallback="en"
+locale/translations=PackedStringArray("res://i18n/translations.en.translation", "res://i18n/translations.zh_CN.translation", "res://i18n/translations.zh_TW.translation", "res://i18n/translations.ja.translation", "res://i18n/translations.ko.translation", "res://i18n/translations.es.translation", "res://i18n/translations.fr.translation", "res://i18n/translations.de.translation", "res://i18n/translations.pt.translation", "res://i18n/translations.ru.translation", "res://i18n/translations.pl.translation", "res://i18n/translations.vi.translation", "res://i18n/translations.id.translation", "res://i18n/translations.ar.translation", "res://i18n/translations.tr.translation", "res://i18n/translations.th.translation", "res://i18n/translations.uk.translation")
+
 [input]
 
 zoom_in={
