@@ -257,6 +257,9 @@ func _process(_delta):
 	if Input.is_action_just_pressed("ui_comments"):  toggle(%Comments, false, -(18 * 7.5))
 
 func _on_gui_input(_event):
+	if Input.is_action_just_pressed("ui_save"):
+		accept_event()
+		return
 	if Input.is_action_just_pressed("ui_open"):      accept_event(); toggle(%FileDialog)
 	if Input.is_action_just_pressed("ui_settings"):  accept_event(); toggle(%Settings, true, (18 * 7.5) * 2)
 	if Input.is_action_just_pressed("ui_info"):      accept_event(); toggle(%Info, true, 1500)

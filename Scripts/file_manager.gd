@@ -159,13 +159,16 @@ func _notification(what):
 
 		save_data(save_dict)
 		if !is_manual_save():
-			Fs.save(current_file, Code.text)
+			var err_close = Fs.save(current_file, Code.text)
+			if err_close != OK and current_file:
+				push_error("Failed to save %s on close: %d" % [current_file, err_close])
 
 		get_tree().quit()
 	if what == MainLoop.NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if is_manual_save(): return
-		Fs.save(current_file, Code.text)
-		# ^^ you usually defocus when you want to run the code, so saving is needed
+		var err_focus = Fs.save(current_file, Code.text)
+		if err_focus != OK and current_file:
+			push_error("Failed to save %s on focus out: %d" % [current_file, err_focus])
 
 func save_data(dict: Dictionary):
 	var save_game = FileAccess.open("user://data.save", FileAccess.WRITE)
@@ -213,11 +216,18 @@ func load_game(cli: bool = false):
 		LuaSingleton.on_settings_change.emit()
 
 
-func save_current_file() -> void:
-	if !current_file: return
+func save_current_file() -> Error:
+	if current_file.is_empty():
+		warn(tr("WARN_NO_FILE"))
+		return ERR_FILE_NOT_FOUND
 
-	Fs.save(current_file, Code.text)
-	Code.file_modified = false
+	var err = Fs.save(current_file, Code.text)
+	if err == OK:
+		Code.file_modified = false
+		warn(tr("SAVED"))
+	else:
+		warn(tr("WARN_SAVE_FAILED") % current_file)
+	return err
 
 func is_manual_save() -> bool:
 	return bool(LuaSingleton.get_setting("manual_save")[0].get("value", false))
@@ -227,7 +237,10 @@ func _on_auto_save_timer_timeout():
 	if !current_file: return
 	if !Code.file_modified: return
 
-	Fs.save(current_file, Code.text)
+	var err = Fs.save(current_file, Code.text)
+	if err != OK:
+		push_error("Auto-save failed for %s: %d" % [current_file, err])
+		return
 	Code.file_modified = false;
 
 func preview_theme(index: int) -> void:
