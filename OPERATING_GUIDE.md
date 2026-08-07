@@ -61,7 +61,7 @@ godot --path . path/to/file.lua
 | 编辑 | 常规 CodeEdit 行为：输入、退格、方向键移动、Home/End、PageUp/PageDown 等均可用 |
 | 代码补全 | 输入时自动触发补全（设置中可关闭），含有函数 / 变量 / 关键字 / API 提示 |
 | 自动配对括号 | `auto_brace_completion` 开启后自动补全括号并高亮匹配括号 |
-| 自动保存 | **没有 Ctrl+S**。退出窗口或窗口失焦时自动保存当前文件（`file_manager.gd`） |
+| 自动保存 | 默认自动保存：每 5 秒写入当前文件；窗口失焦或退出时也会保存。可在设置中切换为手动保存（`Ctrl` + `S`），此时关闭所有自动写盘 |
 
 > 提示：切换语言 / 主题后语法高亮会随文件扩展名变化；Lua 脚本在切换文件扩展名或重启时才会重新加载。
 
@@ -74,6 +74,7 @@ godot --path . path/to/file.lua
 | 快捷键 | 动作 | 来源 |
 | --- | --- | --- |
 | `Ctrl` + `O` | 打开/关闭文件选择器 | `ui_open` |
+| `Ctrl` + `S` | 保存当前文件 | `ui_save` |
 | `Ctrl` + `N` | （全局）在文件选择器新建文件 | `ui_new_file` |
 | `Ctrl` + `Shift` + `N` | （全局）在文件选择器新建文件夹 | `ui_new_folder` |
 | `Ctrl` + `,` | 打开/关闭设置面板 | `ui_settings` |
@@ -156,6 +157,7 @@ GriddyCode 提供 neovide 风格光标拖尾（阻尼弹簧拖尾动画），拖
 | `caret_type` | 下拉 | 光标样式：Line / Block / Underline |
 | `caret_blink` | 开关 | 是否闪烁 |
 | `caret_interval` | 滑杆 | 闪烁间隔（秒） |
+| `manual_save` | 开关 | 手动保存：开启后用 `Ctrl` + `S` 保存，关闭所有自动写盘 |
 | `editor_font` | 下拉 | 编辑器字体（内置 + 系统字体） |
 | `draw_line_numbers` | 开关 | 是否显示行号 |
 | `code_completion` | 开关 | 是否启用补全 |
@@ -192,5 +194,5 @@ GriddyCode 提供 neovide 风格光标拖尾（阻尼弹簧拖尾动画），拖
 
 1. **图标显示为 `□`？** → 请安装 Nerd Font。
 2. **为什么光标闪烁/没闪烁？** → 检查 `caret_blink` 与 `caret_interval` 设置。
-3. **为什么没有 Ctrl+S 保存？** → 自动保存：退出或失焦即保存。
+3. **怎么保存文件？** → 默认自动保存（每 5 秒 + 失焦/退出时）；也可在设置中开启「手动保存」，然后使用 `Ctrl` + `S`。
 4. **没有主题/语言选项？** → 确保 `user://themes` 与 `user://langs` 目录存在且内有对应的 Lua 文件；GitHub 合并的主题/插件需手动放入用户目录。

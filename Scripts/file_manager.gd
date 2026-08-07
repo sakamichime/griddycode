@@ -158,10 +158,12 @@ func _notification(what):
 		}
 
 		save_data(save_dict)
-		Fs.save(current_file, Code.text)
+		if !is_manual_save():
+			Fs.save(current_file, Code.text)
 
 		get_tree().quit()
 	if what == MainLoop.NOTIFICATION_APPLICATION_FOCUS_OUT:
+		if is_manual_save(): return
 		Fs.save(current_file, Code.text)
 		# ^^ you usually defocus when you want to run the code, so saving is needed
 
@@ -211,7 +213,17 @@ func load_game(cli: bool = false):
 		LuaSingleton.on_settings_change.emit()
 
 
+func save_current_file() -> void:
+	if !current_file: return
+
+	Fs.save(current_file, Code.text)
+	Code.file_modified = false
+
+func is_manual_save() -> bool:
+	return bool(LuaSingleton.get_setting("manual_save")[0].get("value", false))
+
 func _on_auto_save_timer_timeout():
+	if is_manual_save(): return
 	if !current_file: return
 	if !Code.file_modified: return
 

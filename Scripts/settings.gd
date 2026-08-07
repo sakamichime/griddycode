@@ -231,6 +231,8 @@ func _process(_delta):
 		if active_overlay != %FileDialog:
 			toggle(%FileDialog)
 		%FileDialog.enter_create_mode(1)
+	if Input.is_action_just_pressed("ui_save"):
+		editor.save_current_file()
 	if Input.is_action_just_pressed("ui_new_folder"):
 		if %FileDialog.create_mode == 2:
 			%FileDialog.cancel_create()
@@ -259,22 +261,6 @@ func _on_gui_input(_event):
 	if Input.is_action_just_pressed("ui_settings"):  accept_event(); toggle(%Settings, true, (18 * 7.5) * 2)
 	if Input.is_action_just_pressed("ui_info"):      accept_event(); toggle(%Info, true, 1500)
 	if Input.is_action_just_pressed("ui_theme"):     accept_event(); toggle(%ThemeChooser, false, (18 * 28))
-	if Input.is_action_just_pressed("ui_new_file"):
-		accept_event()
-		if %FileDialog.create_mode == 1:
-			%FileDialog.cancel_create()
-			return
-		if active_overlay != %FileDialog:
-			toggle(%FileDialog)
-		%FileDialog.enter_create_mode(1)
-	if Input.is_action_just_pressed("ui_new_folder"):
-		accept_event()
-		if %FileDialog.create_mode == 2:
-			%FileDialog.cancel_create()
-			return
-		if active_overlay != %FileDialog:
-			toggle(%FileDialog)
-		%FileDialog.enter_create_mode(2)
 	if Input.is_action_just_pressed("ui_cancel"):
 		if %FileDialog.try_consume_cancel():
 			accept_event()

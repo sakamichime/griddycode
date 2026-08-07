@@ -98,6 +98,13 @@ var settings: Array = [
 		"precision": true,
 	},
 	{
+		"property": "manual_save",
+		"display": "SETTING_MANUAL_SAVE",
+		"options": [],
+		"icon": "󰈈",
+		"value": false
+	},
+	{
 		"property": "draw_line_numbers",
 		"display": "SETTING_DRAW_LINE_NUMBERS",
 		"options": [],
@@ -343,6 +350,13 @@ func handle_internal_setting_change(property: String, value: Variant) -> void:
 		code.caret_blink = value
 	if p == "caret_interval":
 		code.caret_blink_interval = value;
+	if p == "manual_save":
+		var autosave_timer: Timer = editor.get_node("AutoSaveTimer")
+		if autosave_timer:
+			if value:
+				autosave_timer.stop()
+			else:
+				autosave_timer.start()
 	if p == "draw_line_numbers":
 		code.gutters_draw_line_numbers = value;
 	if p == "code_completion":
