@@ -211,9 +211,11 @@ bbcode_enabled = true
 text = "Created by [url=https://youtube.com/facedevstuff][color=#b4a7d6]Face[/color][/url] & the contributors at [url=https://github.com/face-hh/griddycode][color=#b4a7d6]GitHub[/color][/url]
 
 Shortcuts:
-CTRL + O     - open file picker. Navigate with ↑ ↓ ⏎
-CTRL + ,     - open settings.
-CTRL + T     - open theme picker.
+CTRL + O     - open file picker. Navigate with ↑ ↓ ⏎
+CTRL + N     - new file (inside file picker).
+CTRL + SHIFT + N - new folder (inside file picker).
+CTRL + ,     - open settings.
+CTRL + T     - open theme picker.
 CTRL + I     - open this panel.
 [font_size=85]
 [color=#b6b6b6] Copyright (c) 2024 Bussin Industries. All Rights Reserved.

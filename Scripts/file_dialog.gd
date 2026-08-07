@@ -13,6 +13,8 @@ var shortened_dirs: Array[String]
 var files: Array[String]
 
 var query: String = ""
+var create_mode: int = 0
+var _cancel_consumed: bool = false
 var search_limit: int = 1000
 var current_dirs_count: int = 0
 var handled: bool
@@ -55,6 +57,7 @@ func change_dir(path) -> void:
 
 func setup() -> void:
 	active = false
+	create_mode = 0
 	change_dir(editor.current_dir)
 
 	update_ui()
@@ -68,6 +71,10 @@ func _input(event: InputEvent) -> void:
 	bbcode_dirs.append_array(dirs)
 
 	if !(key_event.is_pressed()): return;
+
+	if create_mode != 0:
+		_handle_create_input(key_event)
+		return
 
 	handled = true
 	if key_event.keycode == KEY_UP:
@@ -105,11 +112,40 @@ func _input(event: InputEvent) -> void:
 
 	update_ui()
 
+func _handle_create_input(key_event: InputEventKey) -> void:
+	if key_event.ctrl_pressed or key_event.meta_pressed:
+		if key_event.keycode == KEY_ESCAPE or Input.is_action_just_pressed("ui_cancel"):
+			_cancel_consumed = true
+			cancel_create()
+		return
+	if key_event.keycode == KEY_ESCAPE or Input.is_action_just_pressed("ui_cancel"):
+		_cancel_consumed = true
+		cancel_create()
+		return
+	if key_event.keycode == KEY_ENTER:
+		confirm_create(query)
+		return
+	if key_event.keycode == KEY_BACKSPACE:
+		if len(query) > 0:
+			query = query.substr(0, len(query) - 1)
+		update_ui()
+		return
+	var character = key_event.unicode
+	if character == 0:
+		return
+	if len(query) == 0 and character == 46: # leading dot
+		return
+	if query.contains("/") or query.contains("\\"):
+		return
+	query += char(character)
+	update_ui()
+
 func update_ui() -> void:
 	clear()
 	show_items()
 
 func show_items() -> void:
+	_draw_create_indicator()
 	for i in range(len(bbcode_dirs)):
 		show_item(i)
 
@@ -186,6 +222,84 @@ func handle_enter_key() -> void:
 		dir.change_dir(item)
 		change_dir(item)
 	update_ui()
+
+func enter_create_mode(mode: int) -> void:
+	create_mode = mode
+	query = ""
+	update_ui()
+
+func cancel_create() -> void:
+	create_mode = 0
+	query = ""
+	update_ui()
+
+func try_consume_cancel() -> bool:
+	if _cancel_consumed:
+		_cancel_consumed = false
+		return true
+	return false
+
+func confirm_create(name: String) -> void:
+	name = name.strip_edges()
+	if name.is_empty():
+		return
+	if name == "." or name == "..":
+		editor.warn(tr("WARN_INVALID_NAME"))
+		return
+	if name.contains("/") or name.contains("\\"):
+		editor.warn(tr("WARN_INVALID_NAME"))
+		return
+
+	var current_path = dir.get_current_dir()
+	var target = current_path + "/" + name
+
+	if create_mode == 2:
+		if DirAccess.dir_exists_absolute(target):
+			editor.warn(tr("WARN_EXISTS") % name)
+			return
+		var err = DirAccess.make_dir_recursive_absolute(target)
+		if err != OK:
+			editor.warn(tr("WARN_CREATE_FAILED"))
+			return
+		cancel_create()
+		change_dir(current_path)
+		update_ui()
+		return
+
+	if FileAccess.file_exists(target):
+		editor.warn(tr("WARN_EXISTS") % name)
+		return
+	var file = FileAccess.open(target, FileAccess.WRITE)
+	if file == null:
+		file = null
+		editor.warn(tr("WARN_CREATE_FAILED"))
+		return
+	file = null
+
+	editor.current_dir = current_path
+	editor.open_file(target)
+	LuaSingleton.setup_extension(name.split(".")[-1])
+	code.setup_highlighter()
+	get_tree().create_timer(.1).timeout.connect(func():
+		code.grab_focus()
+	)
+	ui_close.emit()
+	cancel_create()
+
+func _draw_create_indicator() -> void:
+	if create_mode == 0:
+		return
+	push_bgcolor(LuaSingleton.gui.selection_color)
+	push_color(LuaSingleton.gui.font_color)
+	if create_mode == 1:
+		add_text("󰈔")
+	else:
+		add_text("")
+	pop()
+	pop()
+	var label = tr("CREATE_FILE_NEW") if create_mode == 1 else tr("CREATE_FOLDER_NEW")
+	var suffix: String = query if !query.is_empty() else "..."
+	append_text(" " + label + ": " + suffix + "\n")
 
 func make_bold(string: String, indexes: Array) -> String:
 	var new_string: String = ""

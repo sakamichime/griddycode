@@ -224,7 +224,26 @@ func _process(_delta):
 	if Input.is_action_just_pressed("ui_settings"):  toggle(%Settings, true, (18 * 7.5) * 2)
 	if Input.is_action_just_pressed("ui_info"):      toggle(%Info, true, 1500)
 	if Input.is_action_just_pressed("ui_theme"):     toggle(%ThemeChooser, false, (18 * 28))
+	if Input.is_action_just_pressed("ui_new_file"):
+		if %FileDialog.create_mode == 1:
+			%FileDialog.cancel_create()
+			return
+		if active_overlay != %FileDialog:
+			toggle(%FileDialog)
+		%FileDialog.enter_create_mode(1)
+	if Input.is_action_just_pressed("ui_new_folder"):
+		if %FileDialog.create_mode == 2:
+			%FileDialog.cancel_create()
+			return
+		if active_overlay != %FileDialog:
+			toggle(%FileDialog)
+		%FileDialog.enter_create_mode(2)
 	if Input.is_action_just_pressed("ui_cancel"):
+		if %FileDialog.try_consume_cancel():
+			return
+		if %FileDialog.create_mode != 0:
+			%FileDialog.cancel_create()
+			return
 		if _collapsed_carets:
 			_collapsed_carets = false
 			return
@@ -240,7 +259,30 @@ func _on_gui_input(_event):
 	if Input.is_action_just_pressed("ui_settings"):  accept_event(); toggle(%Settings, true, (18 * 7.5) * 2)
 	if Input.is_action_just_pressed("ui_info"):      accept_event(); toggle(%Info, true, 1500)
 	if Input.is_action_just_pressed("ui_theme"):     accept_event(); toggle(%ThemeChooser, false, (18 * 28))
+	if Input.is_action_just_pressed("ui_new_file"):
+		accept_event()
+		if %FileDialog.create_mode == 1:
+			%FileDialog.cancel_create()
+			return
+		if active_overlay != %FileDialog:
+			toggle(%FileDialog)
+		%FileDialog.enter_create_mode(1)
+	if Input.is_action_just_pressed("ui_new_folder"):
+		accept_event()
+		if %FileDialog.create_mode == 2:
+			%FileDialog.cancel_create()
+			return
+		if active_overlay != %FileDialog:
+			toggle(%FileDialog)
+		%FileDialog.enter_create_mode(2)
 	if Input.is_action_just_pressed("ui_cancel"):
+		if %FileDialog.try_consume_cancel():
+			accept_event()
+			return
+		if %FileDialog.create_mode != 0:
+			%FileDialog.cancel_create()
+			accept_event()
+			return
 		if get_caret_count() > 1:
 			remove_secondary_carets()
 			_collapsed_carets = true
