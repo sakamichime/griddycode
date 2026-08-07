@@ -3,11 +3,15 @@ extends Node2D
 
 @onready var Code: CodeEdit = %Code;
 @onready var file_dialog = %FileDialog
+@onready var tabs: GriddyTabBar = %TabBar
 @onready var canvas_layer: CanvasLayer = $CanvasLayer
 const NOTICE = preload("res://Scenes/notice.tscn")
 
 var current_file: String;
 var current_dir: String = "/";
+
+var open_files: Array[String] = [];
+var buffers: Dictionary = {}; # path -> { text, line, col, scroll, file_modified }
 
 var time_start = 0
 var time_now = 0
@@ -60,12 +64,16 @@ func _ready():
 	check_for_reserved()
 
 	load_game(is_cli)
-	open_file(current_file)
+	restore_tabs(is_cli)
 
 	LuaSingleton.themes = list_themes()
 
-	LuaSingleton.setup_extension(current_file.split(".")[-1])
+	if !current_file.is_empty():
+		LuaSingleton.setup_extension(current_file.get_extension())
 	LuaSingleton.setup_theme(LuaSingleton.theme)
+
+	tabs.editor = self
+	tabs.refresh()
 
 	file_dialog.setup()
 
@@ -126,11 +134,142 @@ func warn(notice: String) -> void:
 func open_file(path: String) -> void:
 	LuaSingleton.setup_discord_sdk("Editing " + path.split("/")[-1], "In " + current_dir.split("/")[-1])
 
-	var src = Fs._load(path)
+	if path.is_empty():
+		return
 
-	Code.text = src
+	if open_files.has(path):
+		switch_to(path)
+		return
 
-	current_file = path;
+	open_files.append(path)
+	buffers[path] = {
+		"text": Fs._load(path),
+		"line": 0,
+		"col": 0,
+		"scroll": 0,
+		"file_modified": false,
+	}
+
+	current_file = path
+	current_dir = path.get_base_dir()
+	LuaSingleton.setup_extension(path.get_file().get_extension())
+	load_buffer(current_file)
+	tabs.refresh()
+
+func switch_to(path: String) -> void:
+	if path == current_file:
+		tabs.refresh()
+		return
+	if !open_files.has(path):
+		open_file(path)
+		return
+
+	save_current_buffer()
+	current_file = path
+	current_dir = path.get_base_dir()
+
+	LuaSingleton.setup_discord_sdk("Editing " + path.split("/")[-1], "In " + current_dir.split("/")[-1])
+	LuaSingleton.setup_extension(path.get_file().get_extension())
+
+	load_buffer(current_file)
+	tabs.refresh()
+
+func save_current_buffer() -> void:
+	if current_file.is_empty() or !buffers.has(current_file):
+		return
+
+	buffers[current_file] = {
+		"text": Code.text,
+		"line": Code.get_caret_line(0),
+		"col": Code.get_caret_column(0),
+		"scroll": Code.scroll_vertical,
+		"file_modified": Code.file_modified,
+	}
+
+func load_buffer(path: String) -> void:
+	var buffer: Dictionary = buffers[path]
+
+	Code.text = buffer["text"]
+	Code.set_caret_line(buffer["line"], true, -1, 0)
+	Code.set_caret_column(buffer["col"])
+	Code.scroll_vertical = buffer["scroll"]
+	Code.file_modified = buffer["file_modified"]
+
+	Code.setup_highlighter()
+
+func close_tab(path: String) -> void:
+	if !open_files.has(path):
+		return
+
+	var index := open_files.find(path)
+
+	save_current_buffer()
+	if buffers.has(path):
+		var buffer: Dictionary = buffers[path]
+		if buffer["file_modified"]:
+			var err := Fs.save(path, buffer["text"])
+			if err != OK:
+				push_error("Failed to save %s on close: %d" % [path, err])
+
+	buffers.erase(path)
+	open_files.remove_at(index)
+
+	if open_files.is_empty():
+		current_file = ""
+		Code.text = ""
+		Code.file_modified = false
+		Code.setup_highlighter()
+		tabs.refresh()
+		Code.toggle(%FileDialog)
+		warn(tr("WELCOME"))
+		return
+
+	if path != current_file:
+		tabs.refresh()
+		return
+
+	var new_index := clampi(index, 0, open_files.size() - 1)
+	current_file = open_files[new_index]
+	current_dir = current_file.get_base_dir()
+
+	load_buffer(current_file)
+	tabs.refresh()
+
+func restore_tabs(is_cli: bool) -> void:
+	if is_cli:
+		if current_file.is_empty():
+			return
+		open_files.clear()
+		buffers.clear()
+		open_file(current_file)
+		return
+
+	if open_files.is_empty() and !current_file.is_empty():
+		open_file(current_file)
+		return
+
+	if open_files.is_empty():
+		return
+
+	var saved_current := current_file
+	current_file = ""
+	for opened in open_files:
+		buffers[opened] = {
+			"text": Fs._load(opened),
+			"line": 0,
+			"col": 0,
+			"scroll": 0,
+			"file_modified": false,
+		}
+
+	if open_files.has(saved_current):
+		current_file = saved_current
+	else:
+		current_file = open_files[0]
+
+	current_dir = current_file.get_base_dir()
+
+	load_buffer(current_file)
 
 func list_themes() -> Array:
 	var themes_folder = DirAccess.open("user://themes");
@@ -153,12 +292,14 @@ func _notification(what):
 		var save_dict = {
 			"current_file": current_file,
 			"current_dir": current_dir,
+			"open_files": open_files,
 			"settings": get_property_value(LuaSingleton.settings),
 			"theme": LuaSingleton.theme
 		}
 
 		save_data(save_dict)
 		if !is_manual_save():
+			save_all_buffers(false)
 			var err_close = Fs.save(current_file, Code.text)
 			if err_close != OK and current_file:
 				push_error("Failed to save %s on close: %d" % [current_file, err_close])
@@ -166,9 +307,18 @@ func _notification(what):
 		get_tree().quit()
 	if what == MainLoop.NOTIFICATION_APPLICATION_FOCUS_OUT:
 		if is_manual_save(): return
-		var err_focus = Fs.save(current_file, Code.text)
-		if err_focus != OK and current_file:
-			push_error("Failed to save %s on focus out: %d" % [current_file, err_focus])
+		save_all_buffers(true)
+
+func save_all_buffers(focus_out: bool) -> void:
+	for opened in open_files:
+		if opened == current_file and !focus_out:
+			continue
+		if !buffers.has(opened):
+			continue
+		var err = Fs.save(opened, buffers[opened]["text"])
+		if err != OK:
+			push_error("Failed to save %s on close: %d" % [opened, err])
+		buffers[opened]["file_modified"] = false
 
 func save_data(dict: Dictionary):
 	var save_game = FileAccess.open("user://data.save", FileAccess.WRITE)
@@ -197,6 +347,8 @@ func load_game(cli: bool = false):
 		if !cli:
 			current_dir = node_data["current_dir"]
 			current_file = node_data["current_file"]
+			if node_data.has("open_files") and node_data["open_files"] is Array:
+				open_files = node_data["open_files"]
 
 		LuaSingleton.theme = node_data["theme"]
 
@@ -224,6 +376,9 @@ func save_current_file() -> Error:
 	var err = Fs.save(current_file, Code.text)
 	if err == OK:
 		Code.file_modified = false
+		if buffers.has(current_file):
+			buffers[current_file]["file_modified"] = false
+		tabs.refresh()
 		warn(tr("SAVED"))
 	else:
 		warn(tr("WARN_SAVE_FAILED") % current_file)
@@ -242,6 +397,27 @@ func _on_auto_save_timer_timeout():
 		push_error("Auto-save failed for %s: %d" % [current_file, err])
 		return
 	Code.file_modified = false;
+	if buffers.has(current_file):
+		buffers[current_file]["file_modified"] = false
+	tabs.refresh()
+
+func switch_next_tab() -> void:
+	if open_files.is_empty(): return
+	var index := open_files.find(current_file)
+	switch_to(open_files[(index + 1) % open_files.size()])
+
+func switch_prev_tab() -> void:
+	if open_files.is_empty(): return
+	var index := open_files.find(current_file)
+	switch_to(open_files[(index - 1 + open_files.size()) % open_files.size()])
+
+func switch_to_index(index: int) -> void:
+	if index < 0 or index >= open_files.size(): return
+	switch_to(open_files[index])
+
+func close_current_tab() -> void:
+	if current_file.is_empty(): return
+	close_tab(current_file)
 
 func preview_theme(index: int) -> void:
 	var theme_picker: OptionButton = %ThemeChooser

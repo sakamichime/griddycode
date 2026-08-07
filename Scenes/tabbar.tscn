@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://c83v7tabbar1"]
+
+[ext_resource type="Script" path="res://Scripts/tabbar.gd" id="1_tabbr"]
+
+[node name="TabBar" type="RichTextLabel"]
+unique_name_in_owner = true
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 48.0
+grow_horizontal = 2
+mouse_filter = 0
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+scroll_active = false
+script = ExtResource("1_tabbr")

@@ -233,6 +233,12 @@ func _process(_delta):
 		%FileDialog.enter_create_mode(1)
 	if Input.is_action_just_pressed("ui_save"):
 		editor.save_current_file()
+	if Input.is_action_just_pressed("ui_next_tab"):
+		editor.switch_next_tab()
+	if Input.is_action_just_pressed("ui_prev_tab"):
+		editor.switch_prev_tab()
+	if Input.is_action_just_pressed("ui_close_tab"):
+		editor.close_current_tab()
 	if Input.is_action_just_pressed("ui_new_folder"):
 		if %FileDialog.create_mode == 2:
 			%FileDialog.cancel_create()
@@ -259,6 +265,18 @@ func _process(_delta):
 func _on_gui_input(_event):
 	if Input.is_action_just_pressed("ui_save"):
 		accept_event()
+		return
+	if Input.is_action_just_pressed("ui_next_tab"):
+		accept_event()
+		editor.switch_next_tab()
+		return
+	if Input.is_action_just_pressed("ui_prev_tab"):
+		accept_event()
+		editor.switch_prev_tab()
+		return
+	if Input.is_action_just_pressed("ui_close_tab"):
+		accept_event()
+		editor.close_current_tab()
 		return
 	if Input.is_action_just_pressed("ui_open"):      accept_event(); toggle(%FileDialog)
 	if Input.is_action_just_pressed("ui_settings"):  accept_event(); toggle(%Settings, true, (18 * 7.5) * 2)

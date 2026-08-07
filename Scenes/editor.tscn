@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bj6s526sep4xw"]
+[gd_scene load_steps=21 format=3 uid="uid://bj6s526sep4xw"]
 
 [ext_resource type="Script" path="res://Scripts/file_manager.gd" id="1_x00ag"]
 [ext_resource type="Script" path="res://Scripts/settings.gd" id="2_7x3ll"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://Scripts/cursor_trail.gd" id="13_curtr"]
 [ext_resource type="PackedScene" uid="uid://bjnhor4pywtgc" path="res://Scenes/comments.tscn" id="14_r0w3a"]
 [ext_resource type="AudioStream" uid="uid://bw4elmrq7utxl" path="res://Music/ES_Social Feedia - Heyson.wav" id="14_tdfqv"]
+[ext_resource type="PackedScene" uid="uid://c83v7tabbar1" path="res://Scenes/tabbar.tscn" id="15_tabbr"]
 
 [sub_resource type="Environment" id="Environment_7g1iw"]
 background_mode = 3
@@ -276,6 +277,10 @@ offset_bottom = 2.0
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 offset = Vector2(100, 129.5)
 transform = Transform2D(1, 0, 0, 1, 100, 129.5)
+
+[node name="TabBarLayer" type="CanvasLayer" parent="."]
+
+[node name="TabBar" parent="TabBarLayer" instance=ExtResource("15_tabbr")]
 
 [connection signal="caret_changed" from="Code" to="Code" method="_on_caret_changed"]
 [connection signal="code_completion_requested" from="Code" to="Code" method="_on_code_completion_requested"]
