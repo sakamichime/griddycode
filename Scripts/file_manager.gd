@@ -348,7 +348,10 @@ func load_game(cli: bool = false):
 			current_dir = node_data["current_dir"]
 			current_file = node_data["current_file"]
 			if node_data.has("open_files") and node_data["open_files"] is Array:
-				open_files = node_data["open_files"]
+				open_files.clear()
+				for path in node_data["open_files"]:
+					if path is String and !open_files.has(path):
+						open_files.append(path)
 
 		LuaSingleton.theme = node_data["theme"]
 

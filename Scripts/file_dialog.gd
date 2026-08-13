@@ -29,7 +29,12 @@ signal ui_close
 
 func change_dir(path) -> void:
 	query = ""
-	if !dir: dir = DirAccess.open(path)
+	if !dir:
+		dir = DirAccess.open(path)
+		if !dir:
+			dir = DirAccess.open("/")
+			if !dir:
+				return
 	#dir.include_hidden = true
 	# WARNING: this will heavily affect performance if de-commented
 
