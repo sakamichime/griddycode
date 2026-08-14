@@ -16,6 +16,7 @@ management, the cursor trail, and all settings.
 - [编辑基本操作 / Basic Editing](#basic-editing)
 - [快捷键一览 / Hotkeys](#hotkeys)
 - [文件选择器 / File Picker](#file-picker)
+- [多标签页 / Tabs](#tabs)
 - [光标拖尾 / Cursor Trail](#cursor-trail)
 - [设置项 / Settings](#settings)
 - [数据与 Lua 扩展 / Data & Lua Modding](#data--lua-modding)
@@ -81,6 +82,9 @@ godot --path . path/to/file.lua
 | `Ctrl` + `I` | 打开/关闭信息/介绍面板 | `ui_info` |
 | `Ctrl` + `T` | 打开/关闭主题选择器 | `ui_theme` |
 | `Ctrl` + `L` | 打开/关闭评论菜单 | `ui_comments` |
+| `Ctrl` + `Tab` | 切换到下一个标签页 | `ui_next_tab` |
+| `Ctrl` + `Shift` + `Tab` | 切换到上一个标签页 | `ui_prev_tab` |
+| `Ctrl` + `W` | 关闭当前标签页 | `ui_close_tab` |
 | `Esc` | 关闭当前覆盖层；有多光标时先折叠多光标 | `ui_cancel` |
 
 ### 缩放 / Zoom（可在文件选择器/信息面板使用）
@@ -128,6 +132,20 @@ godot --path . path/to/file.lua
 - 若同名文件/文件夹已存在：弹警告，**不会覆盖**，并保持创建输入状态。
 
 > 该功能由 `file_dialog` 场景提供，`current_dir` 每会话从工作目录读取。
+
+---
+
+## 多标签页 / Tabs
+
+编辑器顶部有标签栏，可同时打开多个文件（`tabbar.gd` / `file_manager.gd`）：
+
+- 打开文件会自动加入标签栏；点击标签可在文件间切换。
+- 标签右侧的 `󰅖` 可关闭该标签（或使用 `Ctrl` + `W` 关闭当前文件）。
+- 有未保存修改（手动保存模式下）的文件会显示黄色 `●` 标记。
+- 每个文件独立保存光标位置 / 滚动位置，切换标签后自动恢复。
+- 标签栏为空时自动隐藏；修改状态随 `on_settings_change` / 主题加载自动刷新。
+
+> 注意：标签切换会立即重载对应文件的语法高亮与 Lua 语言包。
 
 ---
 

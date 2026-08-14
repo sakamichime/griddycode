@@ -1,6 +1,8 @@
 # GriddyCode
 Coding has never been more lit!
 
+**Languages:** [English](./README.md) | [中文](./README.zh-CN.md)
+
 
 https://github.com/face-hh/griddycode/assets/69168154/df93830e-6e24-472d-a854-cea026b12890
 
@@ -89,10 +91,12 @@ If you want to **submit** a theme/plugin, open a pull request adding it to `Lua/
 # Contributions
 Contributions are heavily appreciated, whether it's for adding Lua plugins, themes, safely exposing more features to Lua, or adding features directly to GriddyCode!
 
+Looking for a detailed user guide? Check out [OPERATING_GUIDE.md](./OPERATING_GUIDE.md) (hotkeys, tabs, settings, cursor trail, FAQ).
+
 ## Notice
 - You will need to install the [Godot Engine](https://godotengine.org/) to run your proposed change & make sure it runs flawlessly.
 - You don't have to submit executables.
-- Use the v4.2 of the engine (currently Latest)
+- Use the v4.7 of the engine (currently Latest)
 
 ## 🐛 Current bugs/needed features:
 ### HIGH PRIORITY
@@ -100,11 +104,9 @@ Contributions are heavily appreciated, whether it's for adding Lua plugins, them
 - Light modes get affected by *glow*, while dark modes seem fine.
 
 ### MEDIUM PRIORITY
-- An option in the settings menu (`CTRL` + `,`) to change the font;
-- The current limit for lines is ~1600. If the cursor moves past that amount, the `CodeEdit` node will activate its scrolling, making the camera bug & go out of view. A limit should be implemented so that the camera won't go out of screen.
+- *(empty — previously reported issues are fixed: font switching via the settings menu, and the ~1600-line camera bug.)*
 
 ### LOW PRIORITY
-- Making the cat jumping video in the settings menu fade in/out along the actual menu. Currently it ignores the transition;
 - `CTRL` + `P` to open a **quick file picker**, similar to [VSCode](https://code.visualstudio.com/docs/editor/editingevolved#:~:text=Quick%20file%20navigation,-Tip%3A%20You%20can&text=VS%20Code%20provides%20two%20powerful,release%20Ctrl%20to%20open%20it.).
 - Selecting a setting with the property "shader" *should* disable previously-enabled settings with "shader".
 - The `CheckButton` node for each `setting` scene doesn't change with the theme. This affects light themes specifically.
