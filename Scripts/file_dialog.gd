@@ -150,9 +150,12 @@ func update_ui() -> void:
 	show_items()
 
 func show_items() -> void:
-	_draw_create_indicator()
 	for i in range(len(bbcode_dirs)):
+		if create_mode != 0 and i == selected_index:
+			_draw_create_indicator()
 		show_item(i)
+	if create_mode != 0 and selected_index >= len(bbcode_dirs):
+		_draw_create_indicator()
 
 func show_item(index: int) -> void:
 	var item = dirs[index]
