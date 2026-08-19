@@ -258,6 +258,65 @@ var keywords: Dictionary = {
 	"member":     str_to_clr("e06c75")
 }
 
+const EXTENSION_ALIASES: Dictionary = {
+	"kts": "kt",
+	"hpp": "cpp",
+	"cc": "cpp",
+	"cxx": "cpp",
+	"hh": "cpp",
+	"h": "c",
+	"mjs": "js",
+	"cjs": "js",
+	"yml": "yaml",
+	"pm": "pl",
+	"pyw": "py",
+	"pyi": "py",
+	"hcl": "tf",
+	"dockerfile": "docker",
+}
+
+const CONTENT_SIGNATURES: Array = [
+	["#!/usr/bin/env python", "py"],
+	["#!/usr/bin/python", "py"],
+	["#!/bin/bash", "sh"],
+	["#!/bin/sh", "sh"],
+	["<?php", "php"],
+	["<!doctype html", "html"],
+	["<html", "html"],
+	["fn main", "rs"],
+	["use std::", "rs"],
+	["println!", "rs"],
+	["fn ", "rs"],
+	["fun main", "kt"],
+	["println(", "kt"],
+	["^fun ", "kt"],
+	["^val ", "kt"],
+	["public class", "java"],
+	["^class ", "java"],
+	["package ", "go"],
+	["import \"fmt\"", "go"],
+	["func main", "go"],
+	["#include <", "c"],
+	["^extends ", "gd"],
+	["^class_name ", "gd"],
+	["@tool", "gd"],
+	["^func ", "gd"],
+	["^var ", "gd"],
+	["^const ", "gd"],
+	["local function", "lua"],
+	["--[[", "lua"],
+	["^function ", "lua"],
+	["^local ", "lua"],
+	["^def ", "py"],
+	["console.log", "js"],
+	["module.exports", "js"],
+	["require(", "js"],
+	["using system", "cs"],
+	["select ", "sql"],
+	["create table", "sql"],
+	["insert into", "sql"],
+]
+
 var keywords_to_highlight: Dictionary = {}
 var color_regions_to_highlight: Array = []
 var comments: Array = []
@@ -460,11 +519,16 @@ func _splitstr(input: String, separator: String):
 func _trim(input: String):
 	return input.strip_edges()
 
-func setup_extension(extension):
+func setup_extension(extension: String, content: String = "") -> void:
 	# FILE EXTENSIONS
 	keywords_to_highlight.clear()
 	color_regions_to_highlight.clear()
 	comments.clear()
+
+	var plugin := resolve_language_plugin(extension, content)
+	if plugin.is_empty():
+		editor.warn(tr("WARN_LANG_UNSUPPORTED"))
+		return
 
 	lua.bind_libraries(["base", "table", "string"])
 
@@ -475,13 +539,54 @@ func setup_extension(extension):
 	lua.push_variant("splitstr", _splitstr)
 	lua.push_variant("trim", _trim)
 
-	var err: LuaError = lua.do_file("user://langs/" + extension + ".lua")
+	var err: LuaError = lua.do_file("user://langs/" + plugin + ".lua")
 	if err is LuaError:
 		editor.warn(tr("WARN_LANG_UNSUPPORTED"))
 		print("ERROR %d: %s" % [err.type, err.message])
 		return
 
 	done_parsing.emit()
+
+func resolve_language_plugin(extension: String, content: String = "") -> String:
+	var candidates := PackedStringArray()
+
+	if not extension.is_empty():
+		var ext := extension.to_lower()
+		candidates.append(ext)
+		if EXTENSION_ALIASES.has(ext):
+			candidates.append(EXTENSION_ALIASES[ext])
+
+	for candidate in candidates:
+		if plugin_exists(candidate):
+			return candidate
+
+	var detected := detect_language_from_content(content)
+	if not detected.is_empty() and plugin_exists(detected):
+		return detected
+
+	return ""
+
+func plugin_exists(plugin: String) -> bool:
+	return FileAccess.file_exists("user://langs/" + plugin + ".lua") \
+		or FileAccess.file_exists("res://Lua/Plugins/" + plugin + ".lua")
+
+func detect_language_from_content(content: String) -> String:
+	if content.is_empty():
+		return ""
+
+	var sample := content.substr(0, 4096).to_lower().replace("\r", "")
+
+	for signature in CONTENT_SIGNATURES:
+		if match_signature(sample, signature[0]):
+			return signature[1]
+
+	return ""
+
+func match_signature(sample: String, needle: String) -> bool:
+	if needle.begins_with("^"):
+		var anchored := needle.substr(1)
+		return sample.begins_with(anchored) or sample.contains("\n" + anchored)
+	return sample.contains(needle)
 
 func setup_theme(given_theme: String) -> void:
 	theme_lua.bind_libraries(["base", "table", "string"])

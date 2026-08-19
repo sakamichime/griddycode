@@ -69,7 +69,7 @@ func _ready():
 	LuaSingleton.themes = list_themes()
 
 	if !current_file.is_empty():
-		LuaSingleton.setup_extension(current_file.get_extension())
+		LuaSingleton.setup_extension(current_file.get_extension(), buffers.get(current_file, {}).get("text", ""))
 	LuaSingleton.setup_theme(LuaSingleton.theme)
 
 	tabs.editor = self
@@ -152,7 +152,7 @@ func open_file(path: String) -> void:
 
 	current_file = path
 	current_dir = path.get_base_dir()
-	LuaSingleton.setup_extension(path.get_file().get_extension())
+	LuaSingleton.setup_extension(path.get_file().get_extension(), buffers[path]["text"])
 	load_buffer(current_file)
 	tabs.refresh()
 
@@ -169,7 +169,7 @@ func switch_to(path: String) -> void:
 	current_dir = path.get_base_dir()
 
 	LuaSingleton.setup_discord_sdk("Editing " + path.split("/")[-1], "In " + current_dir.split("/")[-1])
-	LuaSingleton.setup_extension(path.get_file().get_extension())
+	LuaSingleton.setup_extension(path.get_file().get_extension(), buffers[path]["text"])
 
 	load_buffer(current_file)
 	tabs.refresh()

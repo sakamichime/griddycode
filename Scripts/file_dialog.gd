@@ -217,9 +217,6 @@ func handle_enter_key() -> void:
 		editor.current_dir = dir.get_current_dir();
 		editor.open_file(editor.current_dir + "/" + item)
 
-		LuaSingleton.setup_extension(item.split(".")[-1])
-
-		code.setup_highlighter()
 		get_tree().create_timer(.1).timeout.connect(func():
 			code.grab_focus()
 		)
@@ -286,8 +283,6 @@ func confirm_create(name: String) -> void:
 
 	editor.current_dir = current_path
 	editor.open_file(target)
-	LuaSingleton.setup_extension(name.split(".")[-1])
-	code.setup_highlighter()
 	get_tree().create_timer(.1).timeout.connect(func():
 		code.grab_focus()
 	)
