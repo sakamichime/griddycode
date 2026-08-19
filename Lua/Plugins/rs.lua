@@ -109,7 +109,6 @@ highlight(":", "binary")
 -- Strings
 highlight_region("\"", "\"", "string")
 highlight_region("'", "'", "string")
-highlight_region("r#\"", "\"#", "string")
 
 -- Comments
 highlight_region("//", "", "comments", true)

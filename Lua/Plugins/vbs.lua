@@ -85,7 +85,6 @@ highlight_region("\"", "\"", "string")
 
 -- Comments
 highlight_region("'", "", "comments", true)
-highlight_region("Rem ", "", "comments", true)
 
 -- Comments
 add_comment("VBS: for auditing your Windows desk before leaving it")

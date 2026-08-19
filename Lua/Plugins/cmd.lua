@@ -102,7 +102,6 @@ highlight_region("\"", "\"", "string")
 
 -- Comments
 highlight_region("::", "", "comments", true)
-highlight_region("REM", "", "comments", true)
 
 -- Comments
 add_comment("Batch: the language that runs on the Windows you abandoned")
